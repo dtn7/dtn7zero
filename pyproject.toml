@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "dtn7zero"
-version = "0.0.3"
+version = "0.0.4"
 authors = [
     {name = "Lukas Holst", email = "lh700@proton.me"},
 ]
@@ -19,9 +19,9 @@ dependencies = [
     "py-dtn7 >= 0.3.0a1"
 ]
 
-# [project.urls]
-# "Homepage" = ""
-# "Repository" = ""
+[project.urls]
+"Homepage" = "https://github.com/dtn7/dtn7zero"
+"Repository" = "https://github.com/dtn7/dtn7zero"
 
 [tool.setuptools]
 packages = ["dtn7zero", "dtn7zero.convergence_layer_adapters", "dtn7zero.routers", "dtn7zero.storage"]
