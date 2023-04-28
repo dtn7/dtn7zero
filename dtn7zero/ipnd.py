@@ -282,6 +282,14 @@ class IPND:
         address_dicts = []
 
         for interface in netifaces.interfaces():
-            address_dicts += netifaces.ifaddresses(interface).get(netifaces.AF_INET, [])
+            interface_information = netifaces.ifaddresses(interface).get(netifaces.AF_INET, [])
+
+            # linux 'lo' local interface provides 'peer' instead of 'broadcast'
+            # d['peer']=='127.0.0.1' which is no broadcast address
+            # as a hacky solution we hardcode the broadcast address
+            if interface == 'lo':
+                interface_information[0]['broadcast'] = '127.255.255.255'
+
+            address_dicts += interface_information
 
         return list(map(lambda d: d['broadcast'], address_dicts)), list(map(lambda d: d['addr'], address_dicts))

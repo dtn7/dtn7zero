@@ -1,6 +1,6 @@
-[submodule ".\\lib\\micropython-cbor"]
-	path = .\\lib\\micropython-cbor
+[submodule "lib/micropython-cbor"]
+	path = lib/micropython-cbor
 	url = git@github.com:alexmrqt/micropython-cbor.git
-[submodule ".\\lib\\py-dtn7"]
-	path = .\\lib\\py-dtn7
+[submodule "lib/py-dtn7"]
+	path = lib/py-dtn7
 	url = git@github.com:teschmitt/py-dtn7.git
