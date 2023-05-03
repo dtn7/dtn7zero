@@ -112,7 +112,7 @@ the `boot.py` and then the `main.py` if it is present.
 You can install this project locally to directly reflect code changes in your environment.
 Simply run this in the project root folder (requires at least pip v21.1):
 ```shell
-$ pip install --editable .
+$ python -m pip install --editable .
 ```
 
 ### Build
