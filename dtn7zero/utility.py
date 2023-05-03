@@ -111,3 +111,15 @@ def is_correct_group_uri(group_uri: str) -> bool:
     Currently used only on group-endpoint registration by the bpa to check the validity of a full-group-uri.
     """
     return bool(GROUP_URI_REGEX.match(group_uri))
+
+
+def build_broadcast_ipv4_address(address: str, subnet: str) -> str:
+    address_parts = address.split('.')
+
+    for idx, subnet_part_str in enumerate(subnet.split('.')):
+        subnet_part = int(subnet_part_str)
+        inverse_subnet_part = ~subnet_part & 0xff
+
+        address_parts[idx] = str(int(address_parts[idx]) & subnet_part | inverse_subnet_part)
+
+    return '.'.join(address_parts)

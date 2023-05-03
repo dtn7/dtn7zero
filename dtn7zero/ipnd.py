@@ -4,7 +4,7 @@ from typing import Tuple, Optional, List, Dict
 from dtn7zero.constants import RUNNING_MICROPYTHON, IPND_IDENTIFIER_MTCP, PORT_MTCP, PORT_IPND, IPND_SEND_INTERVAL_MILLISECONDS, IPND_BEACON_MAX_SIZE
 from dtn7zero.data import Node
 from dtn7zero.storage import Storage
-from dtn7zero.utility import is_timestamp_older_than_timeout, get_current_clock_millis, debug, warning
+from dtn7zero.utility import is_timestamp_older_than_timeout, get_current_clock_millis, debug, warning, build_broadcast_ipv4_address
 from py_dtn7.bundle import Flags
 
 if RUNNING_MICROPYTHON:
@@ -267,29 +267,27 @@ class IPND:
             warning('wlan is not connected, cannot form broadcast address')
             return []
 
-        address_parts = address.split('.')
-
-        for idx, subnet_part_str in enumerate(subnet.split('.')):
-            subnet_part = int(subnet_part_str)
-            inverse_subnet_part = ~subnet_part & 0xff
-
-            address_parts[idx] = str(int(address_parts[idx]) & subnet_part | inverse_subnet_part)
-
-        return ['.'.join(address_parts)], [address]
+        return [build_broadcast_ipv4_address(address, subnet)], [address]
 
     @staticmethod
     def get_cpython_ipv4_broadcast_addresses() -> (list, list):
-        address_dicts = []
+        broadcast_addresses = []
+        own_addresses = []
 
         for interface in netifaces.interfaces():
             interface_information = netifaces.ifaddresses(interface).get(netifaces.AF_INET, [])
 
-            # linux 'lo' local interface provides 'peer' instead of 'broadcast'
-            # d['peer']=='127.0.0.1' which is no broadcast address
-            # as a hacky solution we hardcode the broadcast address
-            if interface == 'lo':
-                interface_information[0]['broadcast'] = '127.255.255.255'
+            for address_information in interface_information:
+                address = address_information['addr']
+                netmask = address_information['netmask']
 
-            address_dicts += interface_information
+                # in case 'peer' exists => on linux 'lo' interface there is no 'broadcast', only 'peer', but 'netmask' exists
+                # in case 'addr' == 'broadcast' => on linux CORE emulator, no correct 'broadcast' address is provided
+                if 'peer' in address_information or address_information['broadcast'] == address:
+                    broadcast_addresses.append(build_broadcast_ipv4_address(address, netmask))
+                else:
+                    broadcast_addresses.append(address_information['broadcast'])
 
-        return list(map(lambda d: d['broadcast'], address_dicts)), list(map(lambda d: d['addr'], address_dicts))
+                own_addresses.append(address)
+
+        return broadcast_addresses, own_addresses

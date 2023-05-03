@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "dtn7zero"
-version = "0.0.5"
+version = "0.0.6"
 authors = [
     {name = "Lukas Holst", email = "lh700@proton.me"},
 ]
@@ -13,7 +13,7 @@ readme = "README.md"
 requires-python = ">=3.7"
 license = {text = "AGPL-3.0"}
 dependencies = [
-    "requests",
+    "requests >= 2.27.1",
     "cbor2",
     "netifaces",
     "py-dtn7 >= 0.3.0a1"
