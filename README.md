@@ -13,6 +13,9 @@ The current features are:
 - (with extendability for new convergence layer adapters, routing algorithms, and storage managers)
 
 ## Getting Started
+
+Installation has been successfully tested on Windows and Linux (x86_64 and arm64). The required [mpy-cross](https://pypi.org/project/mpy-cross/) has been shown to have installation issues on Mac M1s under Mac OS X and may have to be built and installed manually.
+
 To use dtn7zero in your CPython environment, simply install it via pip (or pip3 on linux):
 ```shell
 $ pip install --upgrade dtn7zero
@@ -50,7 +53,7 @@ Check all USB devices mpremote considers in priority order with `mpremote devs`.
 2. install the esp flash tool: `pip install esptool`
 3. connect your ESP32 via USB and start a terminal at the location of the downloaded firmware
 4. start the following command (with the correct USB port), then hold **boot** until it starts erasing: \
-`esptool --chip esp32 --port /dev/ttyUSB0 erase_flash`
+`esptool --chip esp32 --port /dev/ttyUSB0 erase_flash` (you may have to invoke esptool with `esptool.py --chip ...` here and subsequently)
 5. start the following command (with the correct USB port and firmware name), then hold **boot** until it starts flashing: \
 `esptool --chip esp32 --port /dev/ttyUSB0 --baud 460800 write_flash -z 0x1000 esp32-20220618-v1.19.1.bin`
 6. done, you may now connect to it via: `mpremote` (installation via pip: `pip install mpremote`)
@@ -64,13 +67,14 @@ Check all USB devices mpremote considers in priority order with `mpremote devs`.
 ### First Time dtn7zero Deployment
 1. make sure you check out the repository and the submodules (especially py-dtn7)
 2. install the mpremote tool: `pip install mpremote`
-3. install the mpy-cross compiler tool: `pip install mpy-cross`
+3. install the mpy-cross compiler tool: `pip install mpy-cross` (this may not work on Mac M1s under Max OS) 
 4. populate wlan.json with an appropriate hostname and at least one ssid -> password mapping
 5. check your connection to the ESP32 with: `mpremote`
 6. copy wlan.json to your ESP32: `mpremote fs cp wlan.json :wlan.json`
 7. copy boot.py to your ESP32: `mpremote fs cp boot.py :boot.py`
 8. deploy the dtn7zero and dependencies onto the ESP32 (this can take a while): `python scripts/esp-deployment.py`
-9. done
+9. install required packages: `mpremote mip install urequests` and `mpremote mip install datetime`
+11. done
 
 ### Continuous dtn7zero Deployment
 1. check your connection to the ESP32 with: `mpremote`
@@ -84,7 +88,7 @@ Check all USB devices mpremote considers in priority order with `mpremote devs`.
 
 ### Additional MicroPython Tips & Tricks
 The mpremote tool is normally interrupted by using `ctrl+c`. A special case is the REPL (simply call `mpremote`), which
-can be exited by using `ctrl+~` (tested on windows).
+can be exited by using `ctrl+~` (tested on Windows) or `ctrl+]` (Linux).
 
 If you start a script on MicroPython (`mpremote run ...`) and disconnect the console (`mpremote` -> `ctrl+c`) then the script 
 keeps running.
@@ -100,9 +104,9 @@ $ mpremote fs cp examples/remote_echo_callback.py :main.py
 $ mpremote fs rm :main.py
 ```
 
-Regarding `boot.py`, it is used for user-specific setup code and this framework uses a generic boot script that adjusts
+Regarding `boot.py`: it is used for user-specific setup code and this framework uses a generic boot script that adjusts
 the ESP32's frequency and connects to a Wi-Fi network (blocking until success). MicroPython will create a dummy `boot.py`
-if none is present. MicroPython will not create a dummy `main.py` is none is present. MicroPython will first execute
+if none is present. MicroPython will not create a dummy `main.py` if none is present. MicroPython will first execute
 the `boot.py` and then the `main.py` if it is present.
 
 
