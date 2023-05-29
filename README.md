@@ -36,10 +36,14 @@ time.sleep(1)
 ```
 Further examples for the 'simple' API can be found under `./examples` in the GitHub repository.
 
-For a deeper dive into the underlying concepts and the fully fletched dtn implementation, take a look at the 
-`dtn7zero.api` module implementation and the tests under `./tests`.
+For a deeper dive into the underlying concepts and the full-fledged dtn implementation, take a look at the 
+`dtn7zero.api` module implementation and the tests under `./test`.
 
 ## MicroPython Installation Guide
+Installation has been successfully tested on Windows and Linux (x86_64 and arm64). The required
+[mpy-cross](https://pypi.org/project/mpy-cross/) has been shown to have installation issues on Mac M1s
+under Mac OS X and may have to be built and installed manually.
+
 This whole project was tested on an ESP32 (GENERIC) and this installation guide is tailored for the ESP32.
 If you plan to use another microcontroller you might need to do adjustments 
 (most certainly the MicroPython installation, and the MPY_MARCH in esp-deployment.py).
@@ -67,14 +71,14 @@ Check all USB devices mpremote considers in priority order with `mpremote devs`.
 ### First Time dtn7zero Deployment
 1. make sure you check out the repository and the submodules (especially py-dtn7)
 2. install the mpremote tool: `pip install mpremote`
-3. install the mpy-cross compiler tool: `pip install mpy-cross` (this may not work on Mac M1s under Max OS) 
+3. install the mpy-cross compiler tool: `pip install mpy-cross` (this may not work on Mac M1s under Mac OS X) 
 4. populate wlan.json with an appropriate hostname and at least one ssid -> password mapping
 5. check your connection to the ESP32 with: `mpremote`
 6. copy wlan.json to your ESP32: `mpremote fs cp wlan.json :wlan.json`
 7. copy boot.py to your ESP32: `mpremote fs cp boot.py :boot.py`
 8. deploy the dtn7zero and dependencies onto the ESP32 (this can take a while): `python scripts/esp-deployment.py`
 9. install required packages: `mpremote mip install urequests` and `mpremote mip install datetime`
-11. done
+10. done
 
 ### Continuous dtn7zero Deployment
 1. check your connection to the ESP32 with: `mpremote`
