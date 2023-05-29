@@ -14,8 +14,6 @@ The current features are:
 
 ## Getting Started
 
-Installation has been successfully tested on Windows and Linux (x86_64 and arm64). The required [mpy-cross](https://pypi.org/project/mpy-cross/) has been shown to have installation issues on Mac M1s under Mac OS X and may have to be built and installed manually.
-
 To use dtn7zero in your CPython environment, simply install it via pip (or pip3 on linux):
 ```shell
 $ pip install --upgrade dtn7zero
@@ -56,16 +54,16 @@ Check all USB devices mpremote considers in priority order with `mpremote devs`.
 1. download the newest [firmware](https://micropython.org/download/esp32/)
 2. install the esp flash tool: `pip install esptool`
 3. connect your ESP32 via USB and start a terminal at the location of the downloaded firmware
-4. start the following command (with the correct USB port), then hold **boot** until it starts erasing: \
-`esptool --chip esp32 --port /dev/ttyUSB0 erase_flash` (you may have to invoke esptool with `esptool.py --chip ...` here and subsequently)
-5. start the following command (with the correct USB port and firmware name), then hold **boot** until it starts flashing: \
-`esptool --chip esp32 --port /dev/ttyUSB0 --baud 460800 write_flash -z 0x1000 esp32-20220618-v1.19.1.bin`
+4. start the following command (with the correct USB port): \
+`esptool --chip esp32 --port /dev/ttyUSB0 erase_flash` (you may have to invoke esptool with `esptool.py --chip ...` here and subsequently, you may also have hold **boot** to enter the bootloader on the ESP32)
+5. start the following command (with the correct USB port and firmware name): \
+`esptool --chip esp32 --port /dev/ttyUSB0 --baud 460800 write_flash -z 0x1000 esp32-20220618-v1.19.1.bin` (you may have hold **boot** again to enter the bootloader on the ESP32)
 6. done, you may now connect to it via: `mpremote` (installation via pip: `pip install mpremote`)
 
 ### Update To New MicroPython Version
 1. download the newest [firmware](https://micropython.org/download/esp32/)
-2. start the following command (with the correct USB port and firmware name), then hold **boot** until it starts flashing: \
-`esptool --chip esp32 --port /dev/ttyUSB0 --baud 460800 write_flash -z 0x1000 esp32-20220618-v1.19.1.bin`
+2. start the following command (with the correct USB port and firmware name): \
+`esptool --chip esp32 --port /dev/ttyUSB0 --baud 460800 write_flash -z 0x1000 esp32-20220618-v1.19.1.bin` (you may have hold **boot** to enter the bootloader on the ESP32)
 3. done
 
 ### First Time dtn7zero Deployment
