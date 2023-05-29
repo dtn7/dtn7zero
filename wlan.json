@@ -1,2 +1,6 @@
-{"HOSTNAME": "", "WLAN_CREDENTIALS": {
-}}
+{
+    "HOSTNAME": "__INSERT_HOSTNAME__",
+    "WLAN_CREDENTIALS": {
+        "__INSERT_WIFI_SSID__": "__INSERT_PASSWORD__"
+    }
+}
