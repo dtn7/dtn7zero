@@ -1,6 +1,6 @@
 from typing import Dict, List, Optional, Tuple
 
-from dtn7zero.convergence_layer_adapters import CLA
+from dtn7zero.convergence_layer_adapters import PullBasedCLA
 from dtn7zero.data import Node
 from dtn7zero.utility import debug, warning
 
@@ -14,7 +14,7 @@ from py_dtn7 import DTNRESTClient, Bundle
 from dtn7zero.constants import IPND_IDENTIFIER_REST
 
 
-class Dtn7RsRestCLA(CLA):
+class Dtn7RsRestCLA(PullBasedCLA):
 
     def __init__(self):
         self.connections: Dict[Node, DTNRESTClient] = {}
@@ -33,7 +33,7 @@ class Dtn7RsRestCLA(CLA):
         node.eid = (1, self.connections[node].node_id)  # todo: remove hardcoded dtn uri scheme assignment
         debug('added new rest cla connection: {} {}'.format(node.eid, http_address))
 
-    def poll(self, bundle_id: str = None, node: Node = None) -> Tuple[Optional[Bundle], Optional[str]]:
+    def poll(self, bundle_id: str, node: Node) -> Tuple[Optional[Bundle], Optional[str]]:
         if bundle_id is None or node is None:
             return None, None
 

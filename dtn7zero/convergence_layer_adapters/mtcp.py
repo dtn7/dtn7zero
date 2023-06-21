@@ -1,6 +1,6 @@
 import socket
 import struct
-from typing import Optional, Dict, List, Tuple
+from typing import Optional, Dict, Tuple
 
 try:
     from cbor2 import dumps
@@ -10,7 +10,7 @@ except ImportError:
 from dtn7zero.constants import PORT_MTCP, MTCP_MAX_CONNECTIONS_STATE_WAITING, SOCKET_RECEIVE_BUFFER_SIZE, \
     MTCP_MAX_CONNECTIONS_STATE_OPEN_RECEIVE, MTCP_TIMEOUT_MILLISECONDS_INACTIVE_RECEIVE, \
     MTCP_TIMEOUT_MILLISECONDS_STALLED_SEND, RUNNING_MICROPYTHON, IPND_IDENTIFIER_MTCP
-from dtn7zero.convergence_layer_adapters import CLA
+from dtn7zero.convergence_layer_adapters import PushBasedCLA
 from dtn7zero.data import Node
 from dtn7zero.utility import get_current_clock_millis, is_timestamp_older_than_timeout, debug, warning
 from py_dtn7 import Bundle
@@ -168,7 +168,7 @@ def _send_message(address, port, message):
     client_socket.close()
 
 
-class MTcpCLA(CLA):
+class MTcpCLA(PushBasedCLA):
 
     def __init__(self):
         # a standard ipv4 stream socket
@@ -284,10 +284,10 @@ class MTcpCLA(CLA):
                 # print('new mtcp receive connection opened from address {}'.format(address_tuple))
                 self.open_receive_connections[address_tuple] = (client_socket, get_current_clock_millis())
 
-    def poll_ids(self, node: Node) -> Optional[List[str]]:
-        return None  # we cannot poll ids, and None signals that
+    def send_to(self, node: Optional[Node], serialized_bundle: bytes) -> bool:
+        if node is None:
+            raise Exception('cannot send bundle to unspecified node with mtcp cla')
 
-    def send_to(self, node: Node, serialized_bundle: bytes) -> bool:
         message = dumps(serialized_bundle)
 
         if IPND_IDENTIFIER_MTCP in node.clas:

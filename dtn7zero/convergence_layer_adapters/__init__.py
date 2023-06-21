@@ -5,9 +5,9 @@ from dtn7zero.data import Node
 from py_dtn7 import Bundle
 
 
-class CLA(ABC):
+class PullBasedCLA(ABC):
 
-    def poll(self, bundle_id: str = None, node: Node = None) -> Tuple[Optional[Bundle], Optional[str]]:
+    def poll(self, bundle_id: str, node: Node) -> Tuple[Optional[Bundle], Optional[str]]:
         raise NotImplementedError('do not instantiate CLA class directly')
 
     def poll_ids(self, node: Node) -> Optional[List[str]]:
@@ -15,3 +15,12 @@ class CLA(ABC):
 
     def send_to(self, node: Node, serialized_bundle: bytes) -> bool:
         raise NotImplementedError('do not instantiate CLA class directly')
+
+
+class PushBasedCLA(ABC):
+    def poll(self) -> Tuple[Optional[Bundle], Optional[str]]:
+        raise NotImplementedError('do not instantiate CLA class directly')
+
+    def send_to(self, node: Optional[Node], serialized_bundle: bytes) -> bool:
+        raise NotImplementedError('do not instantiate CLA class directly')
+

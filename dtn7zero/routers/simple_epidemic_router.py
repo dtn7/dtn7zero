@@ -1,7 +1,7 @@
-from typing import Dict, Iterable
+from typing import Dict, Iterable, Union
 
-from dtn7zero.constants import SIMPLE_EPIDEMIC_ROUTER_MIN_NODES_TO_FORWARD_TO, IPND_IDENTIFIER_MTCP, IPND_IDENTIFIER_REST
-from dtn7zero.convergence_layer_adapters import CLA
+from dtn7zero.constants import SIMPLE_EPIDEMIC_ROUTER_MIN_NODES_TO_FORWARD_TO, IPND_IDENTIFIER_MTCP, IPND_IDENTIFIER_REST, IPND_IDENTIFIER_ESPNOW
+from dtn7zero.convergence_layer_adapters import PullBasedCLA, PushBasedCLA
 from dtn7zero.data import BundleInformation, Node, BundleStatusReportReasonCodes
 from dtn7zero.routers import Router
 from dtn7zero.storage import Storage
@@ -10,23 +10,23 @@ from dtn7zero.utility import warning
 
 class SimpleEpidemicRouter(Router):
 
-    def __init__(self, convergence_layer_adapters: Dict[str, CLA], storage: Storage):
+    def __init__(self, convergence_layer_adapters: Dict[str, Union[PullBasedCLA, PushBasedCLA]], storage: Storage):
         self.clas = convergence_layer_adapters
         self.storage = storage
 
     def generator_poll_bundles(self) -> Iterable[BundleInformation]:
-        # Currently there are only two cla types implemented, which are also the only ones supported here.
+        for cla in self.clas.values():
+            if isinstance(cla, PullBasedCLA):
+                for node in self.storage.get_nodes():
+                    for bundle_information in self._generator_poll_pull_based(node, cla):
+                        yield bundle_information
 
-        for node in self.storage.get_nodes():
-            if IPND_IDENTIFIER_REST in node.clas:
-                for bundle_information in self._generator_poll_advanced(node, self.clas[IPND_IDENTIFIER_REST]):
+            if isinstance(cla, PushBasedCLA):
+                for bundle_information in self._generator_poll_push_based(cla):
                     yield bundle_information
 
-        if IPND_IDENTIFIER_MTCP in self.clas:
-            for bundle_information in self._generator_poll_simple(self.clas[IPND_IDENTIFIER_MTCP]):
-                yield bundle_information
-
-    def _generator_poll_simple(self, cla: CLA):
+    def _generator_poll_push_based(self, cla: PushBasedCLA):
+        # push based clas send/receive whole bundles
         bundle, node_address = cla.poll()
         while bundle is not None:
             if not self.storage.was_seen(bundle.bundle_id):
@@ -41,7 +41,8 @@ class SimpleEpidemicRouter(Router):
                 yield bundle_information
             bundle, node_address = cla.poll()
 
-    def _generator_poll_advanced(self, node: Node, cla: CLA):
+    def _generator_poll_pull_based(self, node: Node, cla: PullBasedCLA):
+        # pull based clas can pull bundle-ids first, before pulling specific bundles
         bundle_ids = cla.poll_ids(node)
 
         for bundle_id in bundle_ids:
@@ -68,12 +69,22 @@ class SimpleEpidemicRouter(Router):
             if node in bundle_information.forwarded_to_nodes:
                 continue
 
-            for cla in self.clas.values():
+            for cla_id, cla in self.clas.items():
+                if cla_id == IPND_IDENTIFIER_ESPNOW:
+                    continue
+
                 success = cla.send_to(node, serialized_bundle)
                 if success:
                     bundle_information.forwarded_to_nodes.append(node)
                 else:
                     reason = BundleStatusReportReasonCodes.TRAFFIC_PARED
+
+        # the espnow cla is special because it broadcasts the bundle
+        # we get no information about how many nodes have received the bundle
+        if IPND_IDENTIFIER_ESPNOW in self.clas:
+            self.clas[IPND_IDENTIFIER_ESPNOW].send_to(None, serialized_bundle)
+            # this is non-standard, but, it is a useful distinction
+            reason = BundleStatusReportReasonCodes.FORWARDED_OVER_UNIDIRECTIONAL_LINK
 
         return len(bundle_information.forwarded_to_nodes) >= SIMPLE_EPIDEMIC_ROUTER_MIN_NODES_TO_FORWARD_TO, reason
 
@@ -87,7 +98,10 @@ class SimpleEpidemicRouter(Router):
 
         bundle: bytes = self.prepare_and_serialize_bundle(full_node_uri, bundle_information)
 
-        for cla in self.clas.values():
+        for cla_id, cla in self.clas.items():
+            if cla_id == IPND_IDENTIFIER_ESPNOW:
+                continue
+
             if cla.send_to(previous_node, bundle):
                 return True
         return False

@@ -289,7 +289,8 @@ class BundleProtocolAgent:
             no_failure_codes = (
                 BundleStatusReportReasonCodes.NO_KNOWN_ROUTE_TO_DESTINATION_FROM_HERE,
                 BundleStatusReportReasonCodes.NO_TIMELY_CONTACT_WITH_NEXT_NODE_ON_ROUTE,
-                BundleStatusReportReasonCodes.TRAFFIC_PARED
+                BundleStatusReportReasonCodes.TRAFFIC_PARED,
+                BundleStatusReportReasonCodes.FORWARDED_OVER_UNIDIRECTIONAL_LINK
             )
 
             if reason in no_failure_codes:

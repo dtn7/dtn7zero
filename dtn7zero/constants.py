@@ -13,6 +13,7 @@ ENCODING = 'utf-8'
 
 IPND_IDENTIFIER_MTCP = 'mtcp'
 IPND_IDENTIFIER_REST = 'rest'  # unofficial, to be used to manually add the rest-cla to a known dtn7rs-node
+IPND_IDENTIFIER_ESPNOW = 'espnow'  # unofficial, to be used to manually add the espnow-cla to the router
 IPND_SEND_INTERVAL_MILLISECONDS = 10000
 
 if RUNNING_MICROPYTHON:
