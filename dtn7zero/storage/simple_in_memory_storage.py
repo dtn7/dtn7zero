@@ -1,6 +1,6 @@
 from typing import Dict, Tuple, List, Optional, Iterable
 
-from dtn7zero.constants import SIMPLE_IN_MEMORY_STORAGE_MAX_STORED_BUNDLES, SIMPLE_IN_MEMORY_STORAGE_MAX_KNOWN_BUNDLE_IDS
+from dtn7zero.configuration import CONFIGURATION
 from dtn7zero.data import BundleInformation, Node
 from dtn7zero.storage import Storage
 from dtn7zero.utility import get_oldest_bundle, get_oldest_bundle_id
@@ -32,7 +32,7 @@ class SimpleInMemoryStorage(Storage):
         if node_address is None and self.bundle_ids.get(bundle_id, None) is not None:
             return  # we do not want to overwrite a valid node with None from an unknown source
 
-        if len(self.bundle_ids) >= SIMPLE_IN_MEMORY_STORAGE_MAX_KNOWN_BUNDLE_IDS:
+        if len(self.bundle_ids) >= CONFIGURATION.SIMPLE_IN_MEMORY_STORAGE_MAX_KNOWN_BUNDLE_IDS:
             del self.bundle_ids[get_oldest_bundle_id(self.bundle_ids)]
         self.bundle_ids[bundle_id] = node_address
 
@@ -45,10 +45,10 @@ class SimpleInMemoryStorage(Storage):
         if bundle_information.bundle.bundle_id in self.bundles:
             return True, removed_bundles
 
-        if len(self.bundles) >= SIMPLE_IN_MEMORY_STORAGE_MAX_STORED_BUNDLES:
+        if len(self.bundles) >= CONFIGURATION.SIMPLE_IN_MEMORY_STORAGE_MAX_STORED_BUNDLES:
             self.garbage_collect()
 
-        if len(self.bundles) >= SIMPLE_IN_MEMORY_STORAGE_MAX_STORED_BUNDLES:
+        if len(self.bundles) >= CONFIGURATION.SIMPLE_IN_MEMORY_STORAGE_MAX_STORED_BUNDLES:
             oldest_bundle = self.bundles.pop(get_oldest_bundle(self.bundles.values()).bundle.bundle_id)
             removed_bundles.append(oldest_bundle)
 

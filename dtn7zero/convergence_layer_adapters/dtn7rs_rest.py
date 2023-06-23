@@ -11,7 +11,7 @@ except ImportError:
 
 from py_dtn7 import DTNRESTClient, Bundle
 
-from dtn7zero.constants import IPND_IDENTIFIER_REST
+from dtn7zero.configuration import CONFIGURATION
 
 
 class Dtn7RsRestCLA(PullBasedCLA):
@@ -21,7 +21,7 @@ class Dtn7RsRestCLA(PullBasedCLA):
 
     def add_connection(self, node: Node):
         http_address = 'http://{}'.format(node.address)
-        port = node.clas[IPND_IDENTIFIER_REST]
+        port = node.clas[CONFIGURATION.IPND.IDENTIFIER_REST]
         try:
             # we assume if there is a dtn7rs-like HTTP-API present, then we can proceed
             dtn7rs_rest_client = DTNRESTClient(host=http_address, port=port)
@@ -63,7 +63,7 @@ class Dtn7RsRestCLA(PullBasedCLA):
         return None
 
     def send_to(self, node: Node, serialized_bundle: bytes) -> bool:
-        if IPND_IDENTIFIER_REST not in node.clas:
+        if CONFIGURATION.IPND.IDENTIFIER_REST not in node.clas:
             return False
 
         if node not in self.connections:

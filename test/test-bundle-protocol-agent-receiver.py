@@ -10,7 +10,7 @@ from dtn7zero.endpoints import LocalEndpoint
 from dtn7zero.convergence_layer_adapters.mtcp import MTcpCLA
 from dtn7zero.storage.simple_in_memory_storage import SimpleInMemoryStorage
 from dtn7zero.routers.simple_epidemic_router import SimpleEpidemicRouter
-from dtn7zero.constants import IPND_IDENTIFIER_MTCP
+from dtn7zero.configuration import CONFIGURATION
 # from dtn7zero.utility import get_current_clock_millis, is_timestamp_older_than_timeout
 from py_dtn7 import Bundle
 # print("after import free: {}, used: {}".format(gc.mem_free(), gc.mem_alloc()))
@@ -24,7 +24,7 @@ def callback(bundle: Bundle):
 
 storage = SimpleInMemoryStorage()
 
-clas = {IPND_IDENTIFIER_MTCP: MTcpCLA()}
+clas = {CONFIGURATION.IPND.IDENTIFIER_MTCP: MTcpCLA()}
 router = SimpleEpidemicRouter(clas, storage)
 bpa = BundleProtocolAgent('dtn://nodeRECEIVE/', storage, router, use_ipnd=True)
 

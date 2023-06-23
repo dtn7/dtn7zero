@@ -16,7 +16,7 @@ The script may then be removed using:
 mpremote fs rm :main.py
 """
 from dtn7zero.bundle_protocol_agent import BundleProtocolAgent
-from dtn7zero.constants import IPND_IDENTIFIER_ESPNOW
+from dtn7zero.configuration import CONFIGURATION
 from dtn7zero.endpoints import LocalEndpoint
 from dtn7zero.convergence_layer_adapters.espnow_cla import EspNowCLA
 from dtn7zero.storage.simple_in_memory_storage import SimpleInMemoryStorage
@@ -24,7 +24,7 @@ from dtn7zero.routers.simple_epidemic_router import SimpleEpidemicRouter
 from dtn7zero.utility import get_current_clock_millis, is_timestamp_older_than_timeout
 
 storage = SimpleInMemoryStorage()
-clas = {IPND_IDENTIFIER_ESPNOW: EspNowCLA()}
+clas = {CONFIGURATION.IPND.IDENTIFIER_ESPNOW: EspNowCLA()}
 router = SimpleEpidemicRouter(clas, storage)
 bpa = BundleProtocolAgent('dtn://esp-1/', storage, router, use_ipnd=False)
 

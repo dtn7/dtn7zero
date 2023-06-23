@@ -10,7 +10,7 @@ It therefore will likely crash after a few exchanged bundles.
 This is an open end topic to investigate.
 """
 from dtn7zero.bundle_protocol_agent import BundleProtocolAgent
-from dtn7zero.constants import IPND_IDENTIFIER_REST, PORT_REST
+from dtn7zero.configuration import CONFIGURATION
 from dtn7zero.convergence_layer_adapters.dtn7rs_rest import Dtn7RsRestCLA
 from dtn7zero.data import Node
 from dtn7zero.endpoints import LocalEndpoint
@@ -18,12 +18,12 @@ from dtn7zero.routers.simple_epidemic_router import SimpleEpidemicRouter
 from dtn7zero.storage.simple_in_memory_storage import SimpleInMemoryStorage
 from dtn7zero.utility import get_current_clock_millis, is_timestamp_older_than_timeout
 
-dtn7rs = Node('192.168.2.163', (1, '//node1/'), {IPND_IDENTIFIER_REST: PORT_REST})
+dtn7rs = Node('192.168.2.163', (1, '//node1/'), {CONFIGURATION.IPND.IDENTIFIER_REST: CONFIGURATION.PORT.REST})
 
 storage = SimpleInMemoryStorage()
 storage.add_node(dtn7rs)
 
-clas = {IPND_IDENTIFIER_REST: Dtn7RsRestCLA()}
+clas = {CONFIGURATION.IPND.IDENTIFIER_REST: Dtn7RsRestCLA()}
 router = SimpleEpidemicRouter(clas, storage)
 bpa = BundleProtocolAgent('dtn://node2/', storage, router, use_ipnd=False)
 

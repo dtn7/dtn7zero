@@ -1,6 +1,6 @@
 from typing import Callable
 
-from dtn7zero.constants import RUNNING_MICROPYTHON, PORT_REST
+from dtn7zero.configuration import RUNNING_MICROPYTHON, CONFIGURATION
 from dtn7zero.data import BundleInformation
 from dtn7zero.utility import debug
 from py_dtn7 import Bundle, DTNRESTClient, to_dtn_timestamp
@@ -159,7 +159,7 @@ class ExternalEndpoint:
         """
         self.endpoint_identifier = endpoint_identifier
 
-        self.dtn_rest_client: DTNRESTClient = DTNRESTClient('http://{}'.format(dtn7rs_ip), PORT_REST)
+        self.dtn_rest_client: DTNRESTClient = DTNRESTClient('http://{}'.format(dtn7rs_ip), CONFIGURATION.PORT.REST)
 
         self.dtn_rest_client.register(self.endpoint_identifier)
 

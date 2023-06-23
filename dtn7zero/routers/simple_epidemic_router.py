@@ -1,6 +1,6 @@
 from typing import Dict, Iterable, Union
 
-from dtn7zero.constants import SIMPLE_EPIDEMIC_ROUTER_MIN_NODES_TO_FORWARD_TO, IPND_IDENTIFIER_MTCP, IPND_IDENTIFIER_REST, IPND_IDENTIFIER_ESPNOW
+from dtn7zero.configuration import CONFIGURATION
 from dtn7zero.convergence_layer_adapters import PullBasedCLA, PushBasedCLA
 from dtn7zero.data import BundleInformation, Node, BundleStatusReportReasonCodes
 from dtn7zero.routers import Router
@@ -70,7 +70,7 @@ class SimpleEpidemicRouter(Router):
                 continue
 
             for cla_id, cla in self.clas.items():
-                if cla_id == IPND_IDENTIFIER_ESPNOW:
+                if cla_id == CONFIGURATION.IPND.IDENTIFIER_ESPNOW:
                     continue
 
                 success = cla.send_to(node, serialized_bundle)
@@ -81,12 +81,12 @@ class SimpleEpidemicRouter(Router):
 
         # the espnow cla is special because it broadcasts the bundle
         # we get no information about how many nodes have received the bundle
-        if IPND_IDENTIFIER_ESPNOW in self.clas:
-            self.clas[IPND_IDENTIFIER_ESPNOW].send_to(None, serialized_bundle)
+        if CONFIGURATION.IPND.IDENTIFIER_ESPNOW in self.clas:
+            self.clas[CONFIGURATION.IPND.IDENTIFIER_ESPNOW].send_to(None, serialized_bundle)
             # this is non-standard, but, it is a useful distinction
             reason = BundleStatusReportReasonCodes.FORWARDED_OVER_UNIDIRECTIONAL_LINK
 
-        return len(bundle_information.forwarded_to_nodes) >= SIMPLE_EPIDEMIC_ROUTER_MIN_NODES_TO_FORWARD_TO, reason
+        return len(bundle_information.forwarded_to_nodes) >= CONFIGURATION.SIMPLE_EPIDEMIC_ROUTER_MIN_NODES_TO_FORWARD_TO, reason
 
     def send_to_previous_node(self, full_node_uri: str, bundle_information: BundleInformation) -> bool:
         previous_node_address = self.storage.get_seen(bundle_information.bundle.bundle_id)
@@ -99,7 +99,7 @@ class SimpleEpidemicRouter(Router):
         bundle: bytes = self.prepare_and_serialize_bundle(full_node_uri, bundle_information)
 
         for cla_id, cla in self.clas.items():
-            if cla_id == IPND_IDENTIFIER_ESPNOW:
+            if cla_id == CONFIGURATION.IPND.IDENTIFIER_ESPNOW:
                 continue
 
             if cla.send_to(previous_node, bundle):

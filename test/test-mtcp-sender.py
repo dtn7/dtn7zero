@@ -28,16 +28,16 @@ from dtn7zero.convergence_layer_adapters.mtcp import MTcpCLA
 from dtn7zero.storage.simple_in_memory_storage import SimpleInMemoryStorage
 from dtn7zero.routers.simple_epidemic_router import SimpleEpidemicRouter
 from dtn7zero.data import Node
-from dtn7zero.constants import IPND_IDENTIFIER_MTCP, PORT_MTCP
+from dtn7zero.configuration import CONFIGURATION
 from dtn7zero.utility import get_current_clock_millis, is_timestamp_older_than_timeout
 
 
-dtn7rs_node = Node('192.168.2.163', (1, '//node1/'), {IPND_IDENTIFIER_MTCP: PORT_MTCP})
+dtn7rs_node = Node('192.168.2.163', (1, '//node1/'), {CONFIGURATION.IPND.IDENTIFIER_MTCP: CONFIGURATION.PORT.MTCP})
 
 storage = SimpleInMemoryStorage()
 storage.add_node(dtn7rs_node)
 
-clas = {IPND_IDENTIFIER_MTCP: MTcpCLA()}
+clas = {CONFIGURATION.IPND.IDENTIFIER_MTCP: MTcpCLA()}
 router = SimpleEpidemicRouter(clas, storage)
 bpa = BundleProtocolAgent('dtn://ESP32-6/', storage, router, use_ipnd=False)
 

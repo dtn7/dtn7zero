@@ -7,9 +7,7 @@ try:
 except ImportError:
     from cbor import dumps
 
-from dtn7zero.constants import PORT_MTCP, MTCP_MAX_CONNECTIONS_STATE_WAITING, SOCKET_RECEIVE_BUFFER_SIZE, \
-    MTCP_MAX_CONNECTIONS_STATE_OPEN_RECEIVE, MTCP_TIMEOUT_MILLISECONDS_INACTIVE_RECEIVE, \
-    MTCP_TIMEOUT_MILLISECONDS_STALLED_SEND, RUNNING_MICROPYTHON, IPND_IDENTIFIER_MTCP
+from dtn7zero.configuration import CONFIGURATION, RUNNING_MICROPYTHON
 from dtn7zero.convergence_layer_adapters import PushBasedCLA
 from dtn7zero.data import Node
 from dtn7zero.utility import get_current_clock_millis, is_timestamp_older_than_timeout, debug, warning
@@ -60,7 +58,7 @@ def _receive_exactly_n_bytes(connection, num_bytes):
 
     while True:
         try:
-            buf = connection.recv(min(num_bytes, SOCKET_RECEIVE_BUFFER_SIZE))
+            buf = connection.recv(min(num_bytes, CONFIGURATION.SOCKET_RECEIVE_BUFFER_SIZE))
         # if a non-blocking read fails we have read everything there is to read at the moment
         # ,but we need to read exactly n bytes
         except OSError:
@@ -141,7 +139,7 @@ def _send_message(address, port, message):
         pass
 
     deadlock_check = get_current_clock_millis()
-    while len(message) > 0 and not is_timestamp_older_than_timeout(deadlock_check, MTCP_TIMEOUT_MILLISECONDS_STALLED_SEND):
+    while len(message) > 0 and not is_timestamp_older_than_timeout(deadlock_check, CONFIGURATION.MTCP.TIMEOUT_MILLISECONDS_STALLED_SEND):
         try:
             bytes_sent = client_socket.send(message)
         # Windows behaviour??? If other end is forcibly closed it raises an ConnectionResetError -> OSError
@@ -177,10 +175,10 @@ class MTcpCLA(PushBasedCLA):
         # allow immediate rebind to a floating socket (last app crashed or otherwise non fully closed server socket)
         self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         # bind to all interfaces available
-        self.socket.bind(('0.0.0.0', PORT_MTCP))
+        self.socket.bind(('0.0.0.0', CONFIGURATION.PORT.MTCP))
         # We will accept a maximum of x connect requests into our connect queue before we are busy
         # A connection gets out of this queue on socket creation
-        self.socket.listen(MTCP_MAX_CONNECTIONS_STATE_WAITING)
+        self.socket.listen(CONFIGURATION.MTCP.MAX_CONNECTIONS_STATE_WAITING)
         # change to non-blocking mode
         # MicroPython supports only one thread/process, and therefore we need to implement everything synchronous
         self.socket.settimeout(0)
@@ -233,7 +231,7 @@ class MTcpCLA(PushBasedCLA):
                     from_node_address = address_tuple[0]
                     self.open_receive_connections[address_tuple] = (connection, get_current_clock_millis())
                     break
-                elif is_timestamp_older_than_timeout(last_received, MTCP_TIMEOUT_MILLISECONDS_INACTIVE_RECEIVE):
+                elif is_timestamp_older_than_timeout(last_received, CONFIGURATION.MTCP.TIMEOUT_MILLISECONDS_INACTIVE_RECEIVE):
                     if not RUNNING_MICROPYTHON:
                         debug('gracefully closing incoming mtcp connection {} due to inactivity timeout'.format(address_tuple))
                         connection.shutdown(socket.SHUT_WR)
@@ -267,7 +265,7 @@ class MTcpCLA(PushBasedCLA):
         return serialized_bundle, from_node_address
 
     def _check_for_new_connections(self):
-        if len(self.open_receive_connections) < MTCP_MAX_CONNECTIONS_STATE_OPEN_RECEIVE:
+        if len(self.open_receive_connections) < CONFIGURATION.MTCP.MAX_CONNECTIONS_STATE_OPEN_RECEIVE:
             try:
                 client_socket, address_tuple = self.socket.accept()
             except OSError:
@@ -290,12 +288,12 @@ class MTcpCLA(PushBasedCLA):
 
         message = dumps(serialized_bundle)
 
-        if IPND_IDENTIFIER_MTCP in node.clas:
+        if CONFIGURATION.IPND.IDENTIFIER_MTCP in node.clas:
             try:
-                port = node.clas[IPND_IDENTIFIER_MTCP]
+                port = node.clas[CONFIGURATION.IPND.IDENTIFIER_MTCP]
                 _send_message(node.address, port, message)
             except (RemoteClosedConnectionException, RemoteStalledConnectionException):
-                del node.clas[IPND_IDENTIFIER_MTCP]  # the node can re-announce it, but currently we cannot connect
+                del node.clas[CONFIGURATION.IPND.IDENTIFIER_MTCP]  # the node can re-announce it, but currently we cannot connect
                 return False
             return True
         return False

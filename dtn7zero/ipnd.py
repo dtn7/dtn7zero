@@ -1,7 +1,7 @@
 import socket
 from typing import Tuple, Optional, List, Dict
 
-from dtn7zero.constants import RUNNING_MICROPYTHON, IPND_IDENTIFIER_MTCP, PORT_MTCP, PORT_IPND, IPND_SEND_INTERVAL_MILLISECONDS, IPND_BEACON_MAX_SIZE
+from dtn7zero.configuration import RUNNING_MICROPYTHON, CONFIGURATION
 from dtn7zero.data import Node
 from dtn7zero.storage import Storage
 from dtn7zero.utility import is_timestamp_older_than_timeout, get_current_clock_millis, debug, warning, build_broadcast_ipv4_address
@@ -197,7 +197,7 @@ class IPND:
             beacon_sequence_number=0,
             eid_scheme=eid_scheme,
             eid_specific_part=eid_specific_part,
-            service_block=([(IPND_IDENTIFIER_MTCP, PORT_MTCP)], {})  # todo: extend for all and active clas'
+            service_block=([(CONFIGURATION.IPND.IDENTIFIER_MTCP, CONFIGURATION.PORT.MTCP)], {})  # todo: extend for all and active clas'
         )
 
         self.last_beacon_broadcast = 0
@@ -205,7 +205,7 @@ class IPND:
     def update(self):
         try:
             # todo: for now it seems one full datagram is returned here, as long as the datagram is smaller than bytes-trying-to-receive
-            raw_data, (address, port) = self.sock.recvfrom(IPND_BEACON_MAX_SIZE)
+            raw_data, (address, port) = self.sock.recvfrom(CONFIGURATION.IPND.BEACON_MAX_SIZE)
         except OSError:
             pass
         except MemoryError:
@@ -245,7 +245,7 @@ class IPND:
                             self.send_own_beacon_to(address)
                             del self.own_beacon.service_block[1][42]
 
-        if is_timestamp_older_than_timeout(self.last_beacon_broadcast, IPND_SEND_INTERVAL_MILLISECONDS):
+        if is_timestamp_older_than_timeout(self.last_beacon_broadcast, CONFIGURATION.IPND.SEND_INTERVAL_MILLISECONDS):
             for address in self.broadcast_addresses:
                 self.send_own_beacon_to(address)
             # minimal_output_beacon_increase_counter_by_one(self.own_beacon)
@@ -256,7 +256,7 @@ class IPND:
         message = self.own_beacon.to_cbor()
 
         while len(message) > 0:
-            sent_bytes = self.sock.sendto(message, (address, PORT_IPND))
+            sent_bytes = self.sock.sendto(message, (address, CONFIGURATION.PORT.IPND))
             message = message[sent_bytes:]
 
     @staticmethod

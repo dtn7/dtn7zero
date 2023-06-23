@@ -10,7 +10,7 @@ import time
 from typing import Optional, List, Tuple, Callable
 
 from dtn7zero.bundle_protocol_agent import BundleProtocolAgent
-from dtn7zero.constants import IPND_IDENTIFIER_MTCP, RUNNING_MICROPYTHON
+from dtn7zero.configuration import CONFIGURATION, RUNNING_MICROPYTHON
 from dtn7zero.convergence_layer_adapters.mtcp import MTcpCLA
 from dtn7zero.data import Node
 from dtn7zero.endpoints import LocalEndpoint, LocalGroupEndpoint
@@ -108,7 +108,7 @@ def setup(full_node_uri: str, node_receive_callback: Callable[[bytes, str, str, 
         raise Exception('setup(node_id) was called twice!')
 
     storage = SimpleInMemoryStorage()
-    router = SimpleEpidemicRouter({IPND_IDENTIFIER_MTCP: MTcpCLA()}, storage)
+    router = SimpleEpidemicRouter({CONFIGURATION.IPND.IDENTIFIER_MTCP: MTcpCLA()}, storage)
     BPA = BundleProtocolAgent(full_node_uri, storage, router, use_ipnd=True)
 
     # node specific endpoint works like a normal endpoint (only receives exactly matched bundles), but for the node itself

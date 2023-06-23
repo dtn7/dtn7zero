@@ -2,7 +2,7 @@ from datetime import datetime, timezone, timedelta
 from typing import Dict, List
 
 from dtn7zero.data import BundleInformation, BundleStatusReportReasonCodes
-from dtn7zero.constants import SEND_STATUS_REPORTS_ENABLED, RUNNING_MICROPYTHON
+from dtn7zero.configuration import CONFIGURATION, RUNNING_MICROPYTHON
 from dtn7zero.endpoints import LocalEndpoint, LocalGroupEndpoint, _LocalEndpoint
 from dtn7zero.ipnd import IPND
 from dtn7zero.routers import Router
@@ -190,7 +190,7 @@ class BundleProtocolAgent:
         for block in bundle.other_blocks[:]:
             flags = block.block_processing_control_flags
 
-            if flags.report_status_if_block_cant_be_processed and SEND_STATUS_REPORTS_ENABLED:
+            if flags.report_status_if_block_cant_be_processed and CONFIGURATION.SEND_STATUS_REPORTS_ENABLED:
                 # todo: generate a status report
                 pass
 
@@ -362,7 +362,7 @@ class BundleProtocolAgent:
         deletion SHOULD be generated, destined for the bundle's report-to endpoint ID. […]
         """
         flags = bundle_information.bundle.primary_block.bundle_processing_control_flags
-        if flags.status_of_report_deletion_is_requested and SEND_STATUS_REPORTS_ENABLED:
+        if flags.status_of_report_deletion_is_requested and CONFIGURATION.SEND_STATUS_REPORTS_ENABLED:
             # todo: generate a status report
             pass
 

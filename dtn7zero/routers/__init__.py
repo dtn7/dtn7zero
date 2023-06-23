@@ -2,7 +2,7 @@ import time
 from abc import ABC
 from typing import Iterable
 
-from dtn7zero.constants import ATTACH_PREVIOUS_NODE_BLOCK
+from dtn7zero.configuration import CONFIGURATION
 from dtn7zero.data import BundleInformation
 from py_dtn7 import Bundle
 from py_dtn7.bundle import PreviousNodeBlock, BlockProcessingControlFlags
@@ -34,7 +34,7 @@ class Router(ABC):
         if bundle.previous_node_block:
             bundle.remove_block(bundle.previous_node_block)
 
-        if ATTACH_PREVIOUS_NODE_BLOCK:
+        if CONFIGURATION.ATTACH_PREVIOUS_NODE_BLOCK:
             flags = BlockProcessingControlFlags(0)
             flags.set_flag(4)  # discard block if block cant be processed
 

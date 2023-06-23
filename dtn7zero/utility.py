@@ -2,7 +2,7 @@ import time
 import re
 from typing import Iterable
 
-from dtn7zero.constants import DEBUG, WARNING
+from dtn7zero.configuration import CONFIGURATION
 
 NODE_URI_REGEX = re.compile(r'(^dtn://[^~/]+/$)|(^ipn://\d+(\.\d+)*$)')
 ENDPOINT_URI_REGEX = re.compile(r'(^dtn://none$)|(^dtn://[^~/]+/([^~/]+/)*[^~/]+$)|(^ipn://\d+(\.\d+)+$)')
@@ -71,12 +71,12 @@ def is_timestamp_older_than_timeout(clock_timestamp_millis: int, timeout_millis:
 
 
 def debug(*args):
-    if DEBUG:
+    if CONFIGURATION.DEBUG:
         print(*args)
 
 
 def warning(*args):
-    if WARNING:
+    if CONFIGURATION.WARNING or CONFIGURATION.DEBUG:
         print(*args)
 
 

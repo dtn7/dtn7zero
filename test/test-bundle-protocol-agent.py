@@ -5,7 +5,7 @@ Registers two local endpoints and sends from one to the other.
 """
 import time
 
-from dtn7zero.constants import IPND_IDENTIFIER_MTCP
+from dtn7zero.configuration import CONFIGURATION
 from dtn7zero.convergence_layer_adapters.mtcp import MTcpCLA
 from dtn7zero.bundle_protocol_agent import BundleProtocolAgent
 from dtn7zero.endpoints import LocalEndpoint
@@ -20,7 +20,7 @@ def callback(bundle: Bundle):
 
 storage = SimpleInMemoryStorage()
 
-clas = {IPND_IDENTIFIER_MTCP: MTcpCLA()}
+clas = {CONFIGURATION.IPND.IDENTIFIER_MTCP: MTcpCLA()}
 
 router = SimpleEpidemicRouter(clas, storage)
 bpa = BundleProtocolAgent('dtn://node2/', storage, router)
