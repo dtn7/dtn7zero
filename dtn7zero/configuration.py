@@ -6,10 +6,16 @@ RUNNING_MICROPYTHON = sys.implementation.name == 'micropython'
 class _SubConfigurationIPND:
 
     def __init__(self):
+        self.ENABLED = True
         self.IDENTIFIER_MTCP = 'mtcp'
         self.IDENTIFIER_REST = 'rest'  # unofficial, to be used to manually add the rest-cla to the router
         self.IDENTIFIER_ESPNOW = 'espnow'  # unofficial, to be used to manually add the espnow-cla to the router
         self.SEND_INTERVAL_MILLISECONDS = 10000
+
+        # the interface whitelist:
+        # fill it with interface names (take a look at the utility script "scripts/print-ipv4-interface-names.py").
+        # an empty list enables all IPND on all IPv4 interfaces.
+        self.INTERFACE_WHITELIST = []
 
         if RUNNING_MICROPYTHON:
             self.BEACON_MAX_SIZE = 256  # for some reason a bigger datagram receive leads to memory leaks ???

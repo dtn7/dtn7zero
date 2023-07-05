@@ -15,6 +15,9 @@ Afterwards, subsequent mpremote calls will not start it again until a soft reset
 The script may then be removed using:
 mpremote fs rm :main.py
 """
+# espnow import as topmost import is necessary or else there might be memory allocation issues with nested imports
+import espnow
+
 from py_dtn7 import Bundle
 
 from dtn7zero.bundle_protocol_agent import BundleProtocolAgent
@@ -24,11 +27,14 @@ from dtn7zero.convergence_layer_adapters.espnow_cla import EspNowCLA
 from dtn7zero.storage.simple_in_memory_storage import SimpleInMemoryStorage
 from dtn7zero.routers.simple_epidemic_router import SimpleEpidemicRouter
 
-storage = SimpleInMemoryStorage()
+
+CONFIGURATION.IPND.ENABLED = False
+
 
 clas = {CONFIGURATION.IPND.IDENTIFIER_ESPNOW: EspNowCLA()}
+storage = SimpleInMemoryStorage()
 router = SimpleEpidemicRouter(clas, storage)
-bpa = BundleProtocolAgent('dtn://esp-2/', storage, router, use_ipnd=False)
+bpa = BundleProtocolAgent('dtn://esp-2/', storage, router)
 
 
 def callback(bundle: Bundle):

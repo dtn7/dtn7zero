@@ -18,14 +18,18 @@ from dtn7zero.routers.simple_epidemic_router import SimpleEpidemicRouter
 from dtn7zero.storage.simple_in_memory_storage import SimpleInMemoryStorage
 from dtn7zero.utility import get_current_clock_millis, is_timestamp_older_than_timeout
 
-dtn7rs = Node('192.168.2.163', (1, '//node1/'), {CONFIGURATION.IPND.IDENTIFIER_REST: CONFIGURATION.PORT.REST})
+
+CONFIGURATION.IPND.ENABLED = False
+
+
+dtn7rs = Node('192.168.2.163', (1, '//node1/'), {CONFIGURATION.IPND.IDENTIFIER_REST: CONFIGURATION.PORT.REST}, 0)
 
 storage = SimpleInMemoryStorage()
 storage.add_node(dtn7rs)
 
 clas = {CONFIGURATION.IPND.IDENTIFIER_REST: Dtn7RsRestCLA()}
 router = SimpleEpidemicRouter(clas, storage)
-bpa = BundleProtocolAgent('dtn://node2/', storage, router, use_ipnd=False)
+bpa = BundleProtocolAgent('dtn://node2/', storage, router)
 
 endpoint = LocalEndpoint('hello')
 bpa.register_endpoint(endpoint)

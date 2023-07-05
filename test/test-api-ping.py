@@ -6,7 +6,7 @@ from py_dtn7.bundle import PrimaryBlock
 
 setup("dtn://node1/")
 
-start_background_update_thread(_sleep_time_seconds=0.1)
+start_background_update_thread(sleep_time_milliseconds=100)
 
 
 def ping_callback(payload: bytes, full_source_uri: str, full_destination_uri: str, primary_block: PrimaryBlock) -> None:

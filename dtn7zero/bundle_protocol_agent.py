@@ -16,7 +16,7 @@ if RUNNING_MICROPYTHON:
 
 class BundleProtocolAgent:
 
-    def __init__(self, full_node_uri: str, storage: Storage, router: Router, use_ipnd=True):
+    def __init__(self, full_node_uri: str, storage: Storage, router: Router):
         """ The main RFC 9171 compliant bpa component.
 
         full_node_uri examples:
@@ -34,14 +34,12 @@ class BundleProtocolAgent:
         self.storage_retry_generator = None
         self.router_poll_generator = None
 
-        self.use_ipnd = use_ipnd
-        if self.use_ipnd:
-            # on micropython we need to handle wireless connections manually
-            if RUNNING_MICROPYTHON and not isconnected():
-                connect()  # the microcontroller may be moved around, so connect to any available network instead of reconnect
+        # on micropython we need to handle wireless connections manually
+        if RUNNING_MICROPYTHON and not isconnected():
+            connect()  # the microcontroller may be moved around, so connect to any available network instead of reconnect
 
-            scheme_encoded, node_encoded = PrimaryBlock.from_full_uri(full_node_uri)
-            self.ipnd = IPND(scheme_encoded, node_encoded, storage)
+        scheme_encoded, node_encoded = PrimaryBlock.from_full_uri(full_node_uri)
+        self.ipnd = IPND(scheme_encoded, node_encoded, storage)
 
     def update(self):
         # on micropython we need to handle wireless connections manually
@@ -49,8 +47,7 @@ class BundleProtocolAgent:
             connect()  # the microcontroller may be moved around, so connect to any available network instead of reconnect
 
         # update discovery
-        if self.use_ipnd:
-            self.ipnd.update()
+        self.ipnd.update()
 
         # process stored/delayed bundle
         if self.storage_retry_generator is None:

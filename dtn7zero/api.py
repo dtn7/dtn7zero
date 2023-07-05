@@ -109,7 +109,7 @@ def setup(full_node_uri: str, node_receive_callback: Callable[[bytes, str, str, 
 
     storage = SimpleInMemoryStorage()
     router = SimpleEpidemicRouter({CONFIGURATION.IPND.IDENTIFIER_MTCP: MTcpCLA()}, storage)
-    BPA = BundleProtocolAgent(full_node_uri, storage, router, use_ipnd=True)
+    BPA = BundleProtocolAgent(full_node_uri, storage, router)
 
     # node specific endpoint works like a normal endpoint (only receives exactly matched bundles), but for the node itself
     endpoint = SimpleEndpoint('', node_receive_callback)
@@ -197,7 +197,7 @@ def update():
     BPA.update()
 
 
-def run_forever(loop_callback=None, loop_callback_interval_milliseconds=1000, _sleep_time_seconds=0):
+def run_forever(loop_callback=None, loop_callback_interval_milliseconds=1000, sleep_time_milliseconds=10):
     """ update loop to run the bundle protocol agent until KeyboardInterrupt
 
     custom_logic_callback can be used for application specific logic after the bundle protocol agent was started
@@ -222,12 +222,15 @@ def run_forever(loop_callback=None, loop_callback_interval_milliseconds=1000, _s
                 last_callback_execution = get_current_clock_millis()
                 loop_callback()
 
-            time.sleep(_sleep_time_seconds)
+            if RUNNING_MICROPYTHON:
+                time.sleep_ms(sleep_time_milliseconds)
+            else:
+                time.sleep(sleep_time_milliseconds / 1000.0)
     except KeyboardInterrupt:
         pass
 
 
-def start_background_update_thread(_sleep_time_seconds=0):
+def start_background_update_thread(sleep_time_milliseconds=10):
     """ (experimental) background update thread
 
     On MicroPython the limited RAM can lead to crashes (most prominently a maximum-recursion-depth RuntimeError).
@@ -248,14 +251,14 @@ def start_background_update_thread(_sleep_time_seconds=0):
         def update_runner():
             while True:
                 BPA.update()
-                time.sleep(_sleep_time_seconds)
+                time.sleep_ms(sleep_time_milliseconds)
 
         BPA_THREAD = _thread.start_new_thread(update_runner, ())
     else:
         def self_stopping_update_runner():
             while threading.main_thread().is_alive():
                 BPA.update()
-                time.sleep(_sleep_time_seconds)
+                time.sleep(sleep_time_milliseconds / 1000.0)
 
         BPA_THREAD = threading.Thread(target=self_stopping_update_runner)
         BPA_THREAD.start()

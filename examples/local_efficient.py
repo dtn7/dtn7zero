@@ -21,7 +21,7 @@ node_endpoint = setup("dtn://node1/", callback)
 FIRST_EXAMPLE = True
 
 if FIRST_EXAMPLE:
-    start_background_update_thread(_sleep_time_seconds=0.1)
+    start_background_update_thread(sleep_time_milliseconds=50)
 
     try:
         while True:
@@ -33,4 +33,4 @@ else:
     def main():
         node_endpoint.send("hello world".encode(), "dtn://node1/")
 
-    run_forever(main, loop_callback_interval_milliseconds=1000, _sleep_time_seconds=0.1)
+    run_forever(main, loop_callback_interval_milliseconds=1000, sleep_time_milliseconds=50)

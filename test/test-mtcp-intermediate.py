@@ -9,7 +9,7 @@ To test the daisy-chain correctly, ipnd is disabled and the nodes are added manu
 --> THE INTERMEDIATE NODE CAN BE REPLACED BY THE dtn7rs
 
 start-command for the dtn7rs intermediate node:
-dtnd -n node1 -r epidemic -C mtcp -e incoming -s mtcp://192.168.2.182:16162/ESP32-6 -s mtcp://192.168.2.162:16162/ESP32-4
+dtnd -n node1 -r epidemic -C mtcp -e incoming -s mtcp://192.168.2.146:16162/ESP32-6 -s mtcp://192.168.2.177:16162/ESP32-4
 
 
 additional notes on the ESP32 sender:
@@ -30,8 +30,11 @@ from dtn7zero.data import Node
 from dtn7zero.configuration import CONFIGURATION
 
 
-esp32_4 = Node('192.168.2.162', (1, '//ESP32-4/'), {CONFIGURATION.IPND.IDENTIFIER_MTCP: CONFIGURATION.PORT.MTCP})
-esp32_6 = Node('192.168.2.182', (1, '//ESP32-6/'), {CONFIGURATION.IPND.IDENTIFIER_MTCP: CONFIGURATION.PORT.MTCP})
+CONFIGURATION.IPND.ENABLED = False
+
+
+esp32_4 = Node('192.168.2.146', (1, '//ESP32-4/'), {CONFIGURATION.IPND.IDENTIFIER_MTCP: CONFIGURATION.PORT.MTCP}, 0)
+esp32_6 = Node('192.168.2.177', (1, '//ESP32-6/'), {CONFIGURATION.IPND.IDENTIFIER_MTCP: CONFIGURATION.PORT.MTCP}, 0)
 
 storage = SimpleInMemoryStorage()
 storage.add_node(esp32_4)
@@ -39,7 +42,7 @@ storage.add_node(esp32_6)
 
 clas = {CONFIGURATION.IPND.IDENTIFIER_MTCP: MTcpCLA()}
 router = SimpleEpidemicRouter(clas, storage)
-bpa = BundleProtocolAgent('dtn://node1/', storage, router, use_ipnd=False)
+bpa = BundleProtocolAgent('dtn://node1/', storage, router)
 
 try:
     while True:

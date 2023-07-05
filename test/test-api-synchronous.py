@@ -31,4 +31,4 @@ def main_loop():
     counter += 1
 
 
-run_forever(main_loop, loop_callback_interval_milliseconds=2000, _sleep_time_seconds=0.1)
+run_forever(main_loop, loop_callback_interval_milliseconds=2000, sleep_time_milliseconds=100)

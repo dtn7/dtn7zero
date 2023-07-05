@@ -190,7 +190,12 @@ class IPND:
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.sock.settimeout(0)
 
-        self.sock.bind(('', 3003))
+        # todo: is there a valid case in enabling IPND dynamically? If so, this case needs to be handled
+        if CONFIGURATION.IPND.ENABLED:
+            self._was_enabled_once = True
+            self.sock.bind(('', 3003))
+        else:
+            self._was_enabled_once = False
 
         # self.own_beacon = create_minimal_output_beacon(eid_scheme, eid_specific_part)
         self.own_beacon = Beacon.from_objects(
@@ -203,6 +208,12 @@ class IPND:
         self.last_beacon_broadcast = 0
 
     def update(self):
+        if not CONFIGURATION.IPND.ENABLED:
+            return
+        elif not self._was_enabled_once:
+            self._was_enabled_once = True
+            self.sock.bind(('', 3003))
+
         try:
             # todo: for now it seems one full datagram is returned here, as long as the datagram is smaller than bytes-trying-to-receive
             raw_data, (address, port) = self.sock.recvfrom(CONFIGURATION.IPND.BEACON_MAX_SIZE)
@@ -274,7 +285,16 @@ class IPND:
         broadcast_addresses = []
         own_addresses = []
 
+        # check that all interface names in the whitelist are valid
+        for interface in CONFIGURATION.IPND.INTERFACE_WHITELIST:
+            if interface not in netifaces.interfaces():
+                raise Exception("IPND INTERFACE_WHITELIST contains non-existent interface: {}".format(interface))
+
         for interface in netifaces.interfaces():
+            # no whitelist -> all enabled; whitelist -> skip interfaces that are not in the list
+            if CONFIGURATION.IPND.INTERFACE_WHITELIST and interface not in CONFIGURATION.IPND.INTERFACE_WHITELIST:
+                continue
+
             interface_information = netifaces.ifaddresses(interface).get(netifaces.AF_INET, [])
 
             for address_information in interface_information:

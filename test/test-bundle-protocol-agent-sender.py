@@ -20,7 +20,7 @@ storage = SimpleInMemoryStorage()
 
 clas = {CONFIGURATION.IPND.IDENTIFIER_MTCP: MTcpCLA()}
 router = SimpleEpidemicRouter(clas, storage)
-bpa = BundleProtocolAgent('dtn://nodeSEND/', storage, router, use_ipnd=True)
+bpa = BundleProtocolAgent('dtn://nodeSEND/', storage, router)
 
 sender_endpoint = LocalEndpoint('sender')
 
