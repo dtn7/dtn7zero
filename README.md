@@ -5,10 +5,11 @@ The current features are:
 - a full bundle protocol agent (without fragment, CRC, and status-report generation support -> todo)
 - a minimal TCP convergence layer
 - a [dtn7-rs](https://github.com/dtn7/dtn7-rs) convergence layer, using the [HTTP/REST](https://github.com/dtn7/dtn7-rs/blob/master/doc/http-client-api.md) interface
-- automatic local-network node-discovery via ipnd module
+- automatic local-network node-discovery via IPND module
 - a standalone 'external' endpoint (which connects to a [dtn7-rs](https://github.com/dtn7/dtn7-rs) via the [HTTP/REST](https://github.com/dtn7/dtn7-rs/blob/master/doc/http-client-api.md)) interface
 - a simplified [NetworkZero](https://networkzero.readthedocs.io/en/latest/networkzero.html) like API to easily get started
 - full MicroPython support (tested on an ESP32-GENERIC)
+- experimental ESPNOW cla (details can be found in the source code: *dtn7zero/convergence_layer_adapters/espnow_cla.py*)
 - (currently uses epidemic routing and in-memory storage managing)
 - (with extendability for new convergence layer adapters, routing algorithms, and storage managers)
 

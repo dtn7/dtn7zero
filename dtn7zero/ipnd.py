@@ -171,7 +171,7 @@ class IPND:
 
     """
     for now, we only support broadcast on all interfaces and IPv4 only.
-    todo: extend functionality to filter network interfaces and support IPv6
+    todo: extend functionality to support IPv6
     todo: extend functionality to delete nodes after a beacon timeout
     """
     def __init__(self, eid_scheme: int, eid_specific_part: str, storage: Storage):
@@ -182,6 +182,9 @@ class IPND:
             self.broadcast_addresses, self.own_addresses = IPND.get_micropython_ipv4_broadcast_addresses()
         else:
             self.broadcast_addresses, self.own_addresses = IPND.get_cpython_ipv4_broadcast_addresses()
+
+        debug("IPND SETUP: own addresses in use: {}".format(self.own_addresses))
+        debug("IPND SETUP: broadcast addresses in use: {}".format(self.broadcast_addresses))
 
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
@@ -232,14 +235,14 @@ class IPND:
                     existing_node = self.storage.get_node(address)
 
                     if existing_node is None:
-                        debug('received beacon from new node: {}, size: {}'.format(address, len(raw_data)))
+                        debug('received beacon from new node: {}, {}'.format(address, beacon))
 
                         new_node = Node(address, (beacon.eid_scheme, beacon.eid_specific_part), dict(beacon.service_block[0]), beacon.beacon_sequence_number)
                         self.storage.add_node(new_node)
 
                         sequence_number_matches = False
                     else:
-                        debug('received beacon from known node: {}, size: {}'.format(address, len(raw_data)))
+                        debug('received beacon from known node: {}, {}'.format(address, beacon))
                         # existing_node.merge_new_info(eid_scheme, eid_specific_part, dict(clas))
                         existing_node.merge_new_info(beacon.eid_scheme, beacon.eid_specific_part, dict(beacon.service_block[0]))
 
@@ -257,10 +260,10 @@ class IPND:
                             del self.own_beacon.service_block[1][42]
 
         if is_timestamp_older_than_timeout(self.last_beacon_broadcast, CONFIGURATION.IPND.SEND_INTERVAL_MILLISECONDS):
+            # Increase before sending because it might happen that a unicast-reply with that number was already sent
+            self.own_beacon.increment_beacon_sequence_number_by_one()
             for address in self.broadcast_addresses:
                 self.send_own_beacon_to(address)
-            # minimal_output_beacon_increase_counter_by_one(self.own_beacon)
-            self.own_beacon.increment_beacon_sequence_number_by_one()
             self.last_beacon_broadcast = get_current_clock_millis()
 
     def send_own_beacon_to(self, address: str):
@@ -272,6 +275,9 @@ class IPND:
 
     @staticmethod
     def get_micropython_ipv4_broadcast_addresses() -> (list, list):
+        if CONFIGURATION.IPND.INTERFACE_WHITELIST:
+            raise Exception("IPND interface whitelist is not supported on Micropython, list: {}".format(CONFIGURATION.IPND.INTERFACE_WHITELIST))
+
         address, subnet, _, _ = wlan.ifconfig()
 
         if address == '0.0.0.0':

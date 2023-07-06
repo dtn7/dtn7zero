@@ -3,8 +3,8 @@ The framework allows to save power by limiting the number of updates in the upda
 
 For this, run_forever, start_background_update_thread have the '_sleep_time_seconds' parameter.
 
-first example: usage of the background thread in combination with '_sleep_time_seconds'
-second example: usage of the single-threaded run_forever() in combination with '_sleep_time_seconds'
+first example: usage of the background thread in combination with 'sleep_time_milliseconds'
+second example: usage of the single-threaded run_forever() in combination with 'sleep_time_milliseconds'
 """
 import time
 
