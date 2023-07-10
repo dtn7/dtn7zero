@@ -64,6 +64,8 @@ class _Configuration:
         self.SIMPLE_EPIDEMIC_ROUTER_MIN_NODES_TO_FORWARD_TO = 3
         self.SOCKET_RECEIVE_BUFFER_SIZE = 512
 
+        self.MICROPYTHON_CHECK_WIFI = True
+
         if RUNNING_MICROPYTHON:
             self.SIMPLE_IN_MEMORY_STORAGE_MAX_STORED_BUNDLES = 7  # experimental setting
             self.SIMPLE_IN_MEMORY_STORAGE_MAX_KNOWN_BUNDLE_IDS = 18  # experimental setting

@@ -35,16 +35,18 @@ class BundleProtocolAgent:
         self.router_poll_generator = None
 
         # on micropython we need to handle wireless connections manually
-        if RUNNING_MICROPYTHON and not isconnected():
-            connect()  # the microcontroller may be moved around, so connect to any available network instead of reconnect
+        if RUNNING_MICROPYTHON and CONFIGURATION.MICROPYTHON_CHECK_WIFI:
+            if not isconnected():
+                connect()  # the microcontroller may be moved around, so connect to any available network instead of reconnect
 
         scheme_encoded, node_encoded = PrimaryBlock.from_full_uri(full_node_uri)
         self.ipnd = IPND(scheme_encoded, node_encoded, storage)
 
     def update(self):
         # on micropython we need to handle wireless connections manually
-        if RUNNING_MICROPYTHON and not isconnected():
-            connect()  # the microcontroller may be moved around, so connect to any available network instead of reconnect
+        if RUNNING_MICROPYTHON and CONFIGURATION.MICROPYTHON_CHECK_WIFI:
+            if not isconnected():
+                connect()  # the microcontroller may be moved around, so connect to any available network instead of reconnect
 
         # update discovery
         self.ipnd.update()

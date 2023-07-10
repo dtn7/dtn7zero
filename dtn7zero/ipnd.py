@@ -282,7 +282,7 @@ class IPND:
 
         if address == '0.0.0.0':
             warning('wlan is not connected, cannot form broadcast address')
-            return []
+            return [], []
 
         return [build_broadcast_ipv4_address(address, subnet)], [address]
 
