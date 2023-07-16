@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "dtn7zero"
-version = "0.0.7"
+version = "0.0.8"
 authors = [
     {name = "Lukas Holst", email = "lh700@proton.me"},
 ]
@@ -16,7 +16,7 @@ dependencies = [
     "requests >= 2.27.1",
     "cbor2",
     "netifaces",
-    "py-dtn7 >= 0.3.0a1"
+    "py-dtn7 == 0.3.0b1"
 ]
 
 [project.urls]
