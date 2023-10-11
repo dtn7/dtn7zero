@@ -4,3 +4,6 @@
 [submodule "lib/py-dtn7"]
 	path = lib/py-dtn7
 	url = https://github.com/teschmitt/py-dtn7.git
+[submodule "lib/PyLoRa"]
+	path = lib/PyLoRa
+	url = https://github.com/lh70/PyLoRa.git
