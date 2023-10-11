@@ -42,7 +42,7 @@ class EspNowCLA(PushBasedCLA):
             try:
                 return Bundle.from_cbor(serialized_bundle), from_node_address
             except Exception as e:
-                warning('error during mtcp bundle deserialization, ignoring bundle. error: {}'.format(e))
+                warning('error during espnow bundle deserialization, ignoring bundle. error: {}'.format(e))
 
         return None, None
 

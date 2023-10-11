@@ -70,7 +70,7 @@ class SimpleEpidemicRouter(Router):
                 continue
 
             for cla_id, cla in self.clas.items():
-                if cla_id == CONFIGURATION.IPND.IDENTIFIER_ESPNOW:
+                if cla_id in (CONFIGURATION.IPND.IDENTIFIER_ESPNOW, CONFIGURATION.IPND.IDENTIFIER_RF95_LORA):
                     continue
 
                 success = cla.send_to(node, serialized_bundle)
@@ -79,12 +79,17 @@ class SimpleEpidemicRouter(Router):
                 else:
                     reason = BundleStatusReportReasonCodes.TRAFFIC_PARED
 
-        # the espnow cla is special because it broadcasts the bundle
+        # the espnow and rf95_lora clas are special because they broadcast the bundle
         # we get no information about how many nodes have received the bundle
         if CONFIGURATION.IPND.IDENTIFIER_ESPNOW in self.clas:
             self.clas[CONFIGURATION.IPND.IDENTIFIER_ESPNOW].send_to(None, serialized_bundle)
             # this is non-standard, but, it is a useful distinction
             reason = BundleStatusReportReasonCodes.FORWARDED_OVER_UNIDIRECTIONAL_LINK
+        if CONFIGURATION.IPND.IDENTIFIER_RF95_LORA in self.clas:
+            self.clas[CONFIGURATION.IPND.IDENTIFIER_RF95_LORA].send_to(None, serialized_bundle)
+            # this is non-standard, but, it is a useful distinction
+            reason = BundleStatusReportReasonCodes.FORWARDED_OVER_UNIDIRECTIONAL_LINK
+            # todo: forwarded_to_nodes is not altered, messages are spammed because retry-wait-time is not set, dirty fix: SIMPLE_EPIDEMIC_ROUTER_MIN_NODES_TO_FORWARD_TO = 0
 
         return len(bundle_information.forwarded_to_nodes) >= CONFIGURATION.SIMPLE_EPIDEMIC_ROUTER_MIN_NODES_TO_FORWARD_TO, reason
 

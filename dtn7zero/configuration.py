@@ -10,6 +10,7 @@ class _SubConfigurationIPND:
         self.IDENTIFIER_MTCP = 'mtcp'
         self.IDENTIFIER_REST = 'rest'  # unofficial, to be used to manually add the rest-cla to the router
         self.IDENTIFIER_ESPNOW = 'espnow'  # unofficial, to be used to manually add the espnow-cla to the router
+        self.IDENTIFIER_RF95_LORA = 'rf95_lora'  # unofficial, to be used to manually add the rf95-lora-cla to the router
         self.SEND_INTERVAL_MILLISECONDS = 10000
 
         # the interface whitelist:
